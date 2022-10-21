@@ -10,7 +10,7 @@
   --color-gray-50: #C0C0C0;
   --color-gray-90: #333;
 
-  --background-color: #fff;
+  --background-color: #829cd0;
 
   --text-color: var(--color-gray-90);
   --text-color-link: #082840;
@@ -67,13 +67,17 @@ a[href]:visited {
 }
 
 main {
+  max-width: 650px;
   padding: 1rem;
+  background-color: #eee;
+  margin: 0 auto;
 }
 main :first-child {
   margin-top: 0;
 }
 header {
   border-bottom: 1px dashed var(--color-gray-20);
+  background-color: #a2bce0;
 }
 header:after {
   content: "";
@@ -253,4 +257,9 @@ a[href].direct-link:focus:visited,
 :hover > a[href].direct-link,
 :hover > a[href].direct-link:visited {
   color: #aaa;
+}
+
+picture {
+  display: flex;
+  justify-content: center;
 }

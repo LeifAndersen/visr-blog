@@ -1,12 +1,38 @@
 const fs = require("fs");
+const path = require("path");
 
 const { DateTime } = require("luxon");
 const markdownIt = require("markdown-it");
 const markdownItAnchor = require("markdown-it-anchor");
 
+const Image = require("@11ty/eleventy-img");
 const pluginRss = require("@11ty/eleventy-plugin-rss");
 const pluginSyntaxHighlight = require("@11ty/eleventy-plugin-syntaxhighlight");
 const pluginNavigation = require("@11ty/eleventy-navigation");
+
+async function imageShortcode(src, alt, sizes = "100vw") {
+  let relsrc = await path.join(path.dirname(this.page.inputPath), src);
+  let metadata = await Image(relsrc, {
+    widths: [300, 600],
+    formats: ["avif", "jpeg", "png"],
+    outputDir: path.dirname(this.page.outputPath),
+    urlPath: this.page.url
+  });
+
+  let imageAttributes = {
+    alt,
+    sizes,
+    loading: "lazy",
+    decoding: "async",
+  };
+
+  // You bet we throw an error on missing alt in `imageAttributes`
+  //   (alt="" works okay)
+  return Image.generateHTML(metadata, imageAttributes, {
+    whitespaceMode: "inline"
+  });
+}
+
 
 module.exports = function(eleventyConfig) {
   // Copy the `img` and `css` folders to the output
@@ -15,7 +41,11 @@ module.exports = function(eleventyConfig) {
 
   // Add plugins
   eleventyConfig.addPlugin(pluginRss);
-  eleventyConfig.addPlugin(pluginSyntaxHighlight);
+  eleventyConfig.addPlugin(pluginSyntaxHighlight, {
+    init: function({Prism}) {
+      require('./.prism.js');
+      Prism.languages.clojurescript = Prism.languages.clojure;
+    }});
   eleventyConfig.addPlugin(pluginNavigation);
 
   eleventyConfig.addFilter("readableDate", dateObj => {
@@ -92,6 +122,8 @@ module.exports = function(eleventyConfig) {
     ui: false,
     ghostMode: false
   });
+
+  eleventyConfig.addNunjucksAsyncShortcode("image", imageShortcode);
 
   return {
     // Control which files Eleventy will process
