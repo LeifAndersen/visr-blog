@@ -1,8 +1,9 @@
 ---
-title: Adding Dependencies in elIDE
+title: Adding Dependencies in elIDE, a VISr IDE
 date: 2022-10-20
 authors: Leif Andersen
 tags: tutorial
+layout: layouts/post.njk
 ---
 
 
@@ -22,10 +23,10 @@ tags: tutorial
 
 Some text:
 
-![Project Menu](menu.png)
+{% image "menu.png", "Project Menu" %}
 
 More Text:
 
-![Deps Dialog](deps.png)
+{% image "deps.png", "Deps Dialog" %}
 
 And More:
