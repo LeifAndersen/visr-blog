@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Using Dependencies in VISr</title>
+    <meta name="description" content="All about Visual and Interactive Syntax">
+
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/prism-base16-monokai.dark.css">
+    <link rel="stylesheet" href="/css/prism-diff.css">
+    <link rel="alternate" href="/feed/feed.xml" type="application/atom+xml" title="The VISr Blog">
+    <link rel="alternate" href="/feed/feed.json" type="application/json" title="The VISr Blog">
+  </head>
+  <body>
+    <header>
+      <h1 class="home"><a href="/">The VISr Blog</a></h1>
+      <ul class="nav">
+      </ul>
+    </header>
+
+    <main class="tmpl-post">
+
+      <h1>Using Dependencies in VISr</h1>
+
+<time datetime="2022-10-20">20 Oct 2022</time>
+<a href="/tags/tutorial/" class="post-tag">tutorial</a>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<link href="/css/index.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<p>When creating and using visual and interactive syntax extensions with VISr, you
+have access to the entire catalog of JavaScript (including WebAssembly and
+TypeScript) libraries found on <a href="https://www.npmjs.com/">NPM</a>. This means your interactive-syntax
+extensions can use the wide range of existing code, from <a href="https://visjs.org/">network layout</a>
+to <a href="https://ocjs.org/">advanced cad libraries</a>.</p>
+<p>This post is a tutorial on how to add, and use, JavaScript dependencies to your
+code. It shows you how to convert an <a href="https://www.npmjs.com/">NPM</a> package for elIDE, the
+predominant VISr IDE. Additionally, this post points you to a directory of
+pre-existing packages. By the end of this tutorial, you will have created a
+small extension that stores tree-literals in your code.</p>
+<p>If you are new to VISr or elIDE, I recommend you follow <a href="../intro/index.html">this introduction
+tutorial</a> first. It covers the basics of how to add interactive-syntax
+extensions to your code, as well as how to create a simple counter extension.
+You can also <a href="https://www.youtube.com/watch?v=8htgAxJuK5c">watch this video</a> to learn about the basics of visual
+and interactive syntax in general.</p>
+<!-- more -->
+<h2 id="the-basics" tabindex="-1">The Basics <a class="direct-link" href="#the-basics" aria-hidden="true">#</a></h2>
+<p>First thing first, you can find a list of the current set of available
+dependencies by going to <a href="http://deps.visr.pl">the VISr dependency page</a>:</p>
+<center><a href="http://deps.visr.pl" type="button" class="btn btn-large btn-info">
+  VISr Dependency Page
+</a></center>
+<p>These are all bundles from NPM that have been pre-packaged for elIDE. Later in
+this tutorial we will cover how to package new bundles. For now though, we will
+install dependencies from this list.</p>
+<h3 id="adding-dependencies-to-elide" tabindex="-1">Adding Dependencies to elIDE <a class="direct-link" href="#adding-dependencies-to-elide" aria-hidden="true">#</a></h3>
+<p>The dependency manager can be found in the <code>Project</code> menu:</p>
+<img alt="Project Menu" loading="lazy" decoding="async" src="/posts/use-deps/D_1JG4s9V--200.png" width="200" height="232">
+<p>When opened, you will be greeted with a window like this:</p>
+<img alt="Deps Dialog" loading="lazy" decoding="async" src="/posts/use-deps/Bl7vub4Kmv-300.png" width="600" height="175" srcset="/posts/use-deps/Bl7vub4Kmv-300.png 300w, /posts/use-deps/Bl7vub4Kmv-600.png 600w" sizes="100vw">
+<p>This is a list of all of the dependencies in your current project. New
+dependencies can be added with the <code>+</code> button, and unneeded dependencies can be
+removed with the <code>-</code> button.</p>
+<p>The <code>Name</code> field is what you will require in your code, while the <code>URL</code> field
+instructs elIDE where to fetch the dependency from. If no URL is provided, then
+a URL is referred from the dependency list at <a href="http://deps.visr.pl">https://deps.visr.pl</a>.</p>
+<p>The <code>Load?</code> option tells elIDE if it should load the dependency when running the
+program. Generally this option should be left on. The only time to turn it off
+is when adding packages that contain only data and no executable code. At the
+time of writing this, only one package fits this description:
+<code>opencascade.wasm</code>.</p>
+<p>For this tutorial we will need two packages: <code>react-graph-vis</code> and
+<code>vis-network-css</code>. Once you hav added those packages press <code>Update</code>, and elIDE
+will download those packages into your project.</p>
+<h3 id="using-in-code" tabindex="-1">Using in Code <a class="direct-link" href="#using-in-code" aria-hidden="true">#</a></h3>
+<p>With these dependencies added, you can now refer to them as you would <a href="http://cljs.github.io/api/cljs.core/#ns">any
+ClojureScript module</a>:</p>
+<pre class="language-clojurescript"><code class="language-clojurescript"><span class="token punctuation">(</span><span class="token keyword">ns</span> tree.core<br>  <span class="token punctuation">(</span><span class="token symbol">:require</span> <span class="token punctuation">[</span>react-graph-vis<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p>This means you also have full access to the <code>:as</code> and <code>:refer</code> keywords as well.
+Do note, however, that many JavaScript modules provide a <code>default</code> export. Unfortunately, those can't be accessed directly through this mechanism. Rather, you can simply access it as a field from your required module:</p>
+<pre class="language-clojurescript"><code class="language-clojurescript"><span class="token punctuation">(</span><span class="token keyword">def</span> Graph <span class="token punctuation">(</span><span class="token function">.-default</span> react-graph-vis<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p>Here, <code>Graph</code> comes from the <a href="https://visjs.github.io/vis-network/docs/network/">Vis.js Network Library</a>. We can now
+construct our VISr as normal:</p>
+<pre class="language-clojurescript"><code class="language-clojurescript"><span class="token comment">;; A Node is one of:</span><br><span class="token comment">;;   - {:left Node :right Node :label String}</span><br><span class="token comment">;;   - {:label String}</span><br><br><span class="token comment">;; A Tree is: {:root Node}</span><br><br><span class="token punctuation">(</span><span class="token function">defvisr</span> Tree<br>  <span class="token punctuation">(</span><span class="token function">state</span> root <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><br>  <span class="token punctuation">(</span><span class="token function">elaborate-fn</span> <span class="token punctuation">[</span>this<span class="token punctuation">]</span><br>    root<span class="token punctuation">)</span><br>  <span class="token punctuation">(</span><span class="token function">render</span> <span class="token punctuation">[</span>this<span class="token punctuation">]</span><br>   <span class="token punctuation">[</span><span class="token symbol">:></span> Graph<br>    <span class="token punctuation">{</span><span class="token symbol">:options</span> <span class="token punctuation">{</span><span class="token symbol">:layout</span> <span class="token punctuation">{</span><span class="token symbol">:hierarchical</span> <span class="token punctuation">{</span><span class="token symbol">:sortMethod</span> <span class="token string">"directed"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">}</span><br>     <span class="token symbol">:graph</span> <span class="token punctuation">(</span><span class="token function">convert-tree</span> <span class="token operator">@</span>root<span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p>For this tutorial, the elaborator is nothing special, it just returns the tree
+as a run-time data structure. The renderer is a little more complicated, but
+offloads most of the work to a <code>convert-tree</code> helper:</p>
+<pre class="language-clojurescript"><code class="language-clojurescript"><span class="token punctuation">(</span><span class="token keyword">defn</span> convert-tree <span class="token punctuation">[</span><span class="token punctuation">{</span>label <span class="token symbol">:label</span><br>                     <span class="token punctuation">{</span>l-label <span class="token symbol">:label</span> <span class="token symbol">:as</span> left<span class="token punctuation">}</span> <span class="token symbol">:left</span><br>                     <span class="token punctuation">{</span>r-label <span class="token symbol">:label</span> <span class="token symbol">:as</span> right<span class="token punctuation">}</span> <span class="token symbol">:right</span><span class="token punctuation">}</span><span class="token punctuation">]</span><br>  <span class="token punctuation">(</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">and</span> left right<span class="token punctuation">)</span><br>    <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token punctuation">[</span><span class="token punctuation">{</span>l-nodes <span class="token symbol">:nodes</span> l-edges <span class="token symbol">:edges</span><span class="token punctuation">}</span> <span class="token punctuation">(</span><span class="token function">convert-tree</span> left<span class="token punctuation">)</span><br>          <span class="token punctuation">{</span>r-nodes <span class="token symbol">:nodes</span> r-edges <span class="token symbol">:edges</span><span class="token punctuation">}</span> <span class="token punctuation">(</span><span class="token function">convert-tree</span> right<span class="token punctuation">)</span><span class="token punctuation">]</span><br>      <span class="token punctuation">{</span><span class="token symbol">:nodes</span> <span class="token punctuation">(</span><span class="token keyword">concat</span> l-nodes r-nodes <span class="token operator">#</span><span class="token punctuation">{</span><span class="token punctuation">{</span><span class="token symbol">:id</span> label <span class="token symbol">:label</span> label<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">)</span><br>       <span class="token symbol">:edges</span> <span class="token punctuation">(</span><span class="token keyword">concat</span> l-edges r-edges <span class="token operator">#</span><span class="token punctuation">{</span><span class="token punctuation">{</span><span class="token symbol">:from</span> label <span class="token symbol">:to</span> l-label<span class="token punctuation">}</span><br>                                        <span class="token punctuation">{</span><span class="token symbol">:from</span> label <span class="token symbol">:to</span> r-label<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span><br>    <span class="token punctuation">{</span><span class="token symbol">:nodes</span> <span class="token operator">#</span><span class="token punctuation">{</span><span class="token punctuation">{</span><span class="token symbol">:id</span> label <span class="token symbol">:label</span> label<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<p>This helper can be used to draw the tree at both during edit time, and run time.
+For example, here is a tree with a root node <code>A</code>, and two leaf nodes <code>x</code>, and <code>y</code>:</p>
+<img alt="A tree created with interactive syntax" loading="lazy" decoding="async" src="/posts/use-deps/7T9w_wrI6j-300.png" width="300" height="149">
+<p>The astute reader may have noticed that while this project uses
+<code>vis-network-css</code>, its not actually used in the code. Instead, it is used by
+<code>react-graph-vis</code> as a peer dependency. Removing it from the dependency list
+causes the tree to render improperly.</p>
+<h2 id="packaging-new-dependencies" tabindex="-1">Packaging New Dependencies <a class="direct-link" href="#packaging-new-dependencies" aria-hidden="true">#</a></h2>
+<p>Using pre-packaged dependencies is useful, but the entire catalog of existing,
+and future, JavaScript libraries is much bigger. Thus it is useful to know how
+to bundle nwe packages for elIDE. If you do create a package, feel free to
+submit a <a href="https://github.com/LeifAndersen/interactive-syntax-clojure/tree/main/scripts/shop">pull request</a> to add it the official dependency repository.</p>
+<p>As of right now, you can not create new elIDE packages from within elIDE.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>
+You will need to install three packages:</p>
+<ol>
+<li><a href="https://racket-lang.org">Racket</a></li>
+<li><a href="https://nodejs.org/en/">nodejs</a></li>
+<li><a href="https://www.npmjs.com/">npm</a></li>
+</ol>
+<p>You can download them seperately, or you can get them through your package
+manger, such as <a href="https://brew.sh/">Homebrew</a> for Linux or macOS:</p>
+<pre class="language-sh"><code class="language-sh">$ brew <span class="token function">install</span> <span class="token function">node</span><br>$ brew <span class="token function">install</span> <span class="token function">npm</span><br>$ brew <span class="token function">install</span> racket</code></pre>
+<p>You will also need the <code>sml</code> package from the Racket repository:</p>
+<pre class="language-sh"><code class="language-sh">$ raco pkg <span class="token function">install</span> sml</code></pre>
+<p>Finally, you will need the <code>scripts/shop</code> folder from the [VISr][visr-source]
+repository:</p>
+<pre class="language-sh"><code class="language-sh">$ <span class="token function">git</span> clone https://github.com/LeifAndersen/interactive-syntax-clojure<br>$ <span class="token builtin class-name">cd</span> interactive-syntax-clojure/scripts/shop</code></pre>
+<p>In this folder, you'll notice two important files, <code>database.sml</code> and
+<code>build.rkt</code>. The former contains the requiremets to build each package, while
+the latter contains the build script itself. Enteries in <code>database.sml</code> consist
+of the package name, a corrosponding NPM package, and a javascript path within
+that package. For example, the entry for <code>react-graph-vis</code> is:</p>
+<pre class="language-sh"><code class="language-sh">$ <span class="token function">cat</span> database.sml<br><span class="token punctuation">[</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span><br>react-graph-vis:<br><span class="token punctuation">{</span>package: <span class="token string">"react-graph-vis"</span> path: <span class="token string">"lib/index.js"</span><span class="token punctuation">}</span><br><span class="token punctuation">[</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span></code></pre>
+<p>You won't need to modify the contents of <code>build.rkt</code>, but you will need to add
+your package to <code>database.sml</code>. Once you have added the entry into the database, you can now build the dependency with <code>build.rkt</code>:</p>
+<pre class="language-sh"><code class="language-sh">$ racket build.rkt <span class="token parameter variable">-v</span> react-graph-vis</code></pre>
+<p>Once built, you will find the dependency in the newly created <code>deps</code> folder.</p>
+<pre class="language-sh"><code class="language-sh">$ <span class="token function">ls</span> deps/<br>react-graph-vis.js<br>react-graph-vis.js.LICENSE.txt</code></pre>
+<p>The first file is the dependency itself, while the second file contains all of
+the licenses of the libraries used to create that dependency.</p>
+<h2 id="wrapping-up" tabindex="-1">Wrapping Up <a class="direct-link" href="#wrapping-up" aria-hidden="true">#</a></h2>
+<p>And that's it. Now you know how to add dependencies to your projects, how to use
+those dependencies when creating interactive-syntax extensions, and how to
+package new JavaScript libraries into dependencies.</p>
+<p>Of course, this entire ecosystem is still under active development. We are
+always interested in conributors, from simple additions to the dependency
+directory, to a complete rework of the how dependencies are built. At the end of
+the day, what counts is all of the cool things we can build using visual and
+interactive-syntax extensions.</p>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>This is not by design. I simply haven't figured out how to run Webpack,
+the crutial component, from within a web browser. If you know how to do
+this, please get in contact with me! <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+
+<hr>
+<ul><li>Previous: <a href="/posts/intro/">Introducing Visual and Interactive-Syntax realized (VISr) for ClojureScript (and JavaScript)</a></li>
+</ul>
+
+    </main>
+
+    <footer></footer>
+
+    <!-- Current page: /posts/use-deps/ -->
+  </body>
+</html>
