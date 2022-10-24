@@ -6,12 +6,6 @@ tags: tutorial
 layout: layouts/post.njk
 ---
 
-<style>
-.caption {
-  display: none;
-}
-</style>
-
 Visual and interactive-syntax is a type of language-oriented programming that
 allows developers to use, view, and edit portions of a textual program with
 graphics. Using interactive-syntax provides the benefits of a graphical
@@ -55,7 +49,7 @@ in other languages.
 
 <!-- more -->
 
-# Getting started with VISr
+## Getting started with VISr
 
 Start by going to [visr.pl][visr], which is a web-based IDE that directly
 supports VISrs. Once in the IDE, press `Insert VISr` to place a VISr at the
@@ -88,7 +82,7 @@ yields the following human readable, and editable, text:
 This operation works in reverse too. Writing out similar text and pasting it
 into [visr.pl][visr] yields its visual representation.
 
-# Making a new VISr
+## Making a new VISr
 
 The `defvisr` form creates a VISr type. This form expects two methods:
 
@@ -115,7 +109,7 @@ the `VISr` the same semantics as a function application. It also allows the
 
 {% image "sig.png", "Example of elaborate-fn semantics" %}
 
-# The Render Method for Edit-Time Semantics
+## The Render Method for Edit-Time Semantics
 
 The `render` method is given the VISr state [as an atom][atom]; updating this
 atom also updates the code to reflect the new state. The return value for
@@ -148,7 +142,7 @@ fixes both of these issues:
       [:> Button {:on-click #(swap! count inc)} @count])))
 ```
 
-# Elaboration and Run-Time Semantics
+## Elaboration and Run-Time Semantics
 
 The elaborate method takes the VISr state, and is expected to provide a
 compile-time or run-time semantics. In the simplified case of `elaborate-fn`,
@@ -166,7 +160,7 @@ Destructuring][destructure] for brevity. The following code is equivalent:
 (elaborate-fn [this] (get this :count))
 ```
 
-# Putting it all together
+## Putting it all together
 
 The final result is:
 

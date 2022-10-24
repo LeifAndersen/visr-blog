@@ -4,17 +4,18 @@ const path = require("path");
 const { DateTime } = require("luxon");
 const markdownIt = require("markdown-it");
 const markdownItAnchor = require("markdown-it-anchor");
+const markdownItFootnote = require("markdown-it-footnote");
 
 const Image = require("@11ty/eleventy-img");
 const pluginRss = require("@11ty/eleventy-plugin-rss");
 const pluginSyntaxHighlight = require("@11ty/eleventy-plugin-syntaxhighlight");
 const pluginNavigation = require("@11ty/eleventy-navigation");
 
-async function imageShortcode(src, alt, sizes = "100vw") {
+async function imageShortcode(src, alt, sizes = "100vw", widths = [300, 600]) {
   let relsrc = await path.join(path.dirname(this.page.inputPath), src);
   let metadata = await Image(relsrc, {
-    widths: [300, 600],
-    formats: ["avif", "jpeg", "png"],
+    widths: widths,
+    formats: ["png"],//"avif", "jpeg", "png"],
     outputDir: path.dirname(this.page.outputPath),
     urlPath: this.page.url
   });
@@ -102,7 +103,7 @@ module.exports = function(eleventyConfig) {
     }),
     level: [1,2,3,4],
     slugify: eleventyConfig.getFilter("slugify")
-  });
+  }).use(markdownItFootnote);
   eleventyConfig.setLibrary("md", markdownLibrary);
 
   // Override Browsersync defaults (used only with --serve)
